@@ -1,0 +1,12 @@
+{
+  "name": "WarKu-3D-Edition-Backend",
+  "version": "1.0.0",
+  "description": "Backend Service for WarKu 3D",
+  "main": "index.js",
+  "repository": "https://github.com/WarKu-Project/WarKu-3D-Edition-Backend.git",
+  "author": "Voraton Lertrattanapaisal <iguru.shou.5410070@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dgt-net": "^1.0.1"
+  }
+}
