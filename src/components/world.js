@@ -9,7 +9,6 @@ let mongodb = require('../mongodb')
 class World {
 
   constructor() {
-      this.time = Time.minute(10)
       log.insert('world','World is created!')
       this.STATE = {
         RUNNING : 'RUNNING',
@@ -18,21 +17,26 @@ class World {
       this.startGame()
   }
 
+  //Start Game
   startGame(){
+    this.setTime(Time.minute(5))
     this.state = this.STATE.RUNNING
     this.updateCurrentStateDB()
     this.startUpdate()
     log.insert('world','Game is Start')
   }
 
-  startUpdate(){
-    this.gameUpdate = setInterval((world)=>{world.update()},Time.second(1),this)
+  //Waiting New Game
+  waitGame(){
+    this.setTime(Time.minute(0.5))
+    this.state = this.STATE.WAITING
+    this.updateCurrentStateDB()
+    this.startUpdate()
+    log.insert('world','Waiting for new Game')
   }
 
-  update(){
-    this.countdown()
-    this.finishStateOrContinue()
-  }
+
+//Check State
 
   finishStateOrContinue(){
     if (this.isFinishState()) this.finishState()
@@ -40,13 +44,38 @@ class World {
 
   finishState(){
     clearInterval(this.gameUpdate)
-    log.insert('world','Finish Game')
+    log.insert('world','Finish State '+this.state)
+    this.changeState()
+  }
+
+  changeState(){
+    switch (this.state) {
+      case this.STATE.RUNNING:
+        this.waitGame()
+        break
+      case this.STATE.WAITING:
+        this.startGame()
+        break
+    }
+  }
+//Update
+  update(){
+    this.countdown()
+    this.finishStateOrContinue()
+  }
+
+  startUpdate(){
+    this.gameUpdate = setInterval((world)=>{world.update()},Time.second(1),this)
   }
 
   updateCurrentStateDB(){
     mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state })
   }
   //Time
+  setTime(time) {
+    this.time = time
+  }
+
   countdown() {
     this.time -= Time.second(1)
     this.updateTimeDB()
