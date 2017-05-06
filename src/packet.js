@@ -1,8 +1,8 @@
 //Import Packet Writer
-var pw = require('dgt-net').packet_writer
+let pw = require('dgt-net').packet_writer
 
 //Define packet
-var packet = {
+let packet = {
 
 }
 
