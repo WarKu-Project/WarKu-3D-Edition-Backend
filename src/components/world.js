@@ -14,6 +14,7 @@ class World {
         RUNNING : 'RUNNING',
         WAITING : 'WAITING'
       }
+      console.log('World is created!');
       this.startGame()
   }
 
@@ -24,6 +25,7 @@ class World {
     this.updateCurrentStateDB()
     this.startUpdate()
     log.insert('world','Game is Start')
+    console.log('Game is Start');
   }
 
   //Waiting New Game
@@ -33,11 +35,11 @@ class World {
     this.updateCurrentStateDB()
     this.startUpdate()
     log.insert('world','Waiting for new Game')
+    console.log('Wait for new game');
   }
 
 
 //Check State
-
   finishStateOrContinue(){
     if (this.isFinishState()) this.finishState()
   }
@@ -58,6 +60,7 @@ class World {
         break
     }
   }
+
 //Update
   update(){
     this.countdown()

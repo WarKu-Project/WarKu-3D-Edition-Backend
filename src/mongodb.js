@@ -6,7 +6,7 @@ const URI = 'mongodb://localhost:27017/warku'
 //Initialize MongoDB
 MongoClient.connect(URI, (err, db) => {
   assert.equal(null, err)
-  console.log("Connected correctly to MongoDB server.")
+  console.log('Connected to MongoDB '+URI);
   db.close()
 })
 
@@ -28,6 +28,8 @@ let update = (collection,target,data) => {
       {
         $set: data,
         $currentDate: { "lastModified": true }
+      },{
+        upsert:true
       }, (err) => {
         assert.equal(err, null)
         db.close()
