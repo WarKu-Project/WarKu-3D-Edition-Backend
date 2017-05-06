@@ -7,7 +7,9 @@ let mongodb = require('../mongodb')
 var subscribers = []
 
 let generateSubscriber = (self,packet,remote,cb) =>{
-  mongodb.find(self,'server',{type:'world'},cb)
+  mongodb.find(self,'server',{type:'world'},(self,server)=>{
+    cb(self,server)
+  })
 }
 
 module.exports = {

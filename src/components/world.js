@@ -1,3 +1,6 @@
+//import library
+let dgt = require('dgt-net')
+
 //import subscriber component
 let packet = require('../subscriber/packet/WorldSubscriberPacket')
 let remote = require('../subscriber/remote/WorldSubscriberRemote')
@@ -25,7 +28,14 @@ class World {
   }
 
   generateSubscriber(self,servers) {
-    self.subscribers = servers
+    self.subscribers = []
+    servers.forEach((server)=>{
+      let subscriber = dgt.client.createClient()
+      subscriber.setPacketObject(packet)
+      subscriber.setRemoteClass(remote)
+      subscriber.connect('localhost',server.port)
+      self.subscribers.push(subscriber)
+    })
   }
 
   //Start Game
@@ -100,6 +110,13 @@ class World {
 
   updateTimeDB(){
     mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.second(this.time) })
+    this.notifyTimeChange()
+  }
+
+  notifyTimeChange(){
+    this.subscribers.forEach((sub)=>{
+      sub.nodeSocket.send(sub.packetObject.updateTime())
+    })
   }
 }
 

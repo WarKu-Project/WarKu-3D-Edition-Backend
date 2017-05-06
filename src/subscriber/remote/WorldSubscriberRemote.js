@@ -11,6 +11,10 @@ class Client extends RemoteProxy {
     console.log("RemoteProxy Disconnected from " + this.getPeerName())
   }
 
+  notifyTimeChange() {
+    this.send(packet.updateTime())
+  }
+
 }
 
 module.exports = Client
