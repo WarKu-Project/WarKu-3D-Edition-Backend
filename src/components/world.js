@@ -1,22 +1,28 @@
 //import util
 let Time = require('../util/time')
+let log = require('../util/log')
+
+//import mongodb
+let mongodb = require('../mongodb')
+
 //define world
 class World {
 
   constructor() {
       this.time = Time.minute(10)
-      console.log("World is created!")
+      log.insert('world','World is created!')
       this.STATE = {
-        RUNNING : 0,
-        WAITING : 1
+        RUNNING : 'RUNNING',
+        WAITING : 'WAITING'
       }
       this.startGame()
   }
 
   startGame(){
     this.state = this.STATE.RUNNING
-    console.log("Start Game");
+    this.updateCurrentStateDB()
     this.startUpdate()
+    log.insert('world','Game is Start')
   }
 
   startUpdate(){
@@ -24,7 +30,6 @@ class World {
   }
 
   update(){
-    console.log(this.time);
     this.countdown()
     this.finishStateOrContinue()
   }
@@ -35,15 +40,24 @@ class World {
 
   finishState(){
     clearInterval(this.gameUpdate)
+    log.insert('world','Finish Game')
   }
 
+  updateCurrentStateDB(){
+    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state })
+  }
   //Time
   countdown() {
     this.time -= Time.second(1)
+    this.updateTimeDB()
   }
 
   isFinishState(){
     return this.time<Time.second(0);
+  }
+
+  updateTimeDB(){
+    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.second(this.time) })
   }
 }
 
