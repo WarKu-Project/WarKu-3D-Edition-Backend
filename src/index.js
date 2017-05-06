@@ -2,13 +2,19 @@
 let server = require('dgt-net').server
 let packet = require('./packet')
 let RemoteProxy = require('./remote')
-let World = require('./components/world')
+
+//Initialize MongoDB
+let mongo = require('./mongodb')
+
+//Initialize Log
+let log = require('./util/log')
 
 //Initialize World
-let world = new World()
+let World = require('./components/world')
 
 //Initialize Server
-let port = 1111
+const PORT = 1111
 server.setRemoteProxyClass(RemoteProxy)
 server.setPacketObject(packet)
-server.listen(port)
+server.listen(PORT)
+log.insert('server','Initialize Server at PORT = '+PORT)
