@@ -38,7 +38,7 @@ let update = (collection,target,data) => {
 }
 
 let remove = (collection,target) => {
-  MongoClient.connect(url, (err, db) => {
+  MongoClient.connect(URI, (err, db) => {
     assert.equal(null, err);
     db.collection(collection).deleteOne(target,(err) => {
       assert.equal(err, null)
@@ -47,8 +47,20 @@ let remove = (collection,target) => {
   })
 }
 
+let find = (self,collection,target,cb) =>{
+  MongoClient.connect(URI, (err, db) => {
+    assert.equal(null, err);
+    db.collection(collection).find(target).toArray((err,results)=>{
+      assert.equal(err, null)
+      cb(self,results);
+      db.close()
+    })
+  })
+}
+
 module.exports = {
   insert : insert,
   update : update,
-  remove : remove
+  remove : remove,
+  find : find
 }

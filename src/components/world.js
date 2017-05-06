@@ -19,9 +19,13 @@ class World {
         RUNNING : 'RUNNING',
         WAITING : 'WAITING'
       }
-      this.subscriber = subscriber.generateSubscriber('localhost',1001,packet,remote)
+      subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
       console.log('World is created!');
       this.startGame()
+  }
+
+  generateSubscriber(self,servers) {
+    self.subscribers = servers
   }
 
   //Start Game
