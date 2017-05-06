@@ -1,3 +1,4 @@
+//Convert to second
 let minute = (min) => {
   return 60000 * min
 }

@@ -1,3 +1,8 @@
+//import subscriber component
+let packet = require('../subscriber/packet/WorldSubscriberPacket')
+let remote = require('../subscriber/remote/WorldSubscriberRemote')
+let subscriber = require('../subscriber/subscriber')
+
 //import util
 let Time = require('../util/time')
 let log = require('../util/log')
@@ -14,6 +19,7 @@ class World {
         RUNNING : 'RUNNING',
         WAITING : 'WAITING'
       }
+      this.subscriber = subscriber.generateSubscriber('localhost',1001,packet,remote)
       console.log('World is created!');
       this.startGame()
   }

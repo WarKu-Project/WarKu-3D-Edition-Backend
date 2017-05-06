@@ -1,5 +1,7 @@
+//import mongodb
 let mongodb = require('../mongodb')
 
+//Log Function
 let insertLog = (tag,msg)=>{
   const data = {
     time : new Date().toLocaleString(),
