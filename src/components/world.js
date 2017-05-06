@@ -17,14 +17,15 @@ let mongodb = require('../mongodb')
 class World {
 
   constructor() {
+      subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
       log.insert('world','World is created!')
       this.STATE = {
         RUNNING : 'RUNNING',
         WAITING : 'WAITING'
       }
-      subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
       console.log('World is created!');
-      this.startGame()
+      this.waitGame()
+      this.setTime(Time.minute(0.5))
   }
 
   generateSubscriber(self,servers) {
@@ -68,6 +69,7 @@ class World {
     clearInterval(this.gameUpdate)
     log.insert('world','Finish State '+this.state)
     this.changeState()
+    this.notifyGameState()
   }
 
   changeState(){
@@ -116,6 +118,12 @@ class World {
   notifyTimeChange(){
     this.subscribers.forEach((sub)=>{
       sub.nodeSocket.send(sub.packetObject.updateTime())
+    })
+  }
+
+  notifyGameState(){
+    this.subscribers.forEach((sub)=>{
+      sub.nodeSocket.send(sub.packetObject.updateGameState())
     })
   }
 }
