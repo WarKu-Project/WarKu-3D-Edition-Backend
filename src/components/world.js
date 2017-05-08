@@ -17,7 +17,7 @@ let mongodb = require('../mongodb')
 class World {
 
   constructor() {
-      subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
+      this.subscribers = []
       log.insert('world','World is created!')
       this.STATE = {
         RUNNING : 'RUNNING',
@@ -28,15 +28,20 @@ class World {
       this.setTime(Time.minute(0.5))
   }
 
-  generateSubscriber(self,servers) {
-    self.subscribers = []
+  subscribe(){
+    subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
+  }
+
+  generateSubscriber(servers,packet,remote) {
     servers.forEach((server)=>{
       let subscriber = dgt.client.createClient()
       subscriber.setPacketObject(packet)
       subscriber.setRemoteClass(remote)
       subscriber.connect('localhost',server.port)
-      self.subscribers.push(subscriber)
     })
+  }
+  addSubscriber(subscriber){
+    this.subscribers.push(subscriber)
   }
 
   //Start Game
@@ -111,19 +116,20 @@ class World {
   }
 
   updateTimeDB(){
-    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.second(this.time) })
+    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.toSecond(this.time) })
     this.notifyTimeChange()
   }
 
+  //Notify Change
   notifyTimeChange(){
     this.subscribers.forEach((sub)=>{
-      sub.nodeSocket.send(sub.packetObject.updateTime())
+      sub.notifyTimeChange()
     })
   }
 
   notifyGameState(){
     this.subscribers.forEach((sub)=>{
-      sub.nodeSocket.send(sub.packetObject.updateGameState())
+      sub.notifyStateChange()
     })
   }
 }

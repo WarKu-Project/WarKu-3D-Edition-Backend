@@ -8,7 +8,7 @@ var subscribers = []
 
 let generateSubscriber = (self,packet,remote,cb) =>{
   mongodb.find(self,'server',{type:'world'},(self,server)=>{
-    cb(self,server)
+    cb(server,packet,remote)
   })
 }
 

@@ -14,7 +14,7 @@ core-util-is@~1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.2.tgz#b5fd54220aa2bc5ab57aab7140c940754503c1a7"
 
-dgt-net@^1.0.1:
+dgt-net@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/dgt-net/-/dgt-net-1.1.0.tgz#c2dbb9c83218f7dd2a130dcd7506895059dc3be3"
 
