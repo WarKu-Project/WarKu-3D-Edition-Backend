@@ -7,6 +7,7 @@
   "author": "Voraton Lertrattanapaisal <iguru.shou.5410070@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "dgt-net": "^1.0.1"
+    "dgt-net": "^1.1.0",
+    "mongodb": "^2.2.26"
   }
 }

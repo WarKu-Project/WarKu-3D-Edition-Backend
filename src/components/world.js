@@ -1,3 +1,11 @@
+//import library
+let dgt = require('dgt-net')
+
+//import subscriber component
+let packet = require('../subscriber/packet/WorldSubscriberPacket')
+let remote = require('../subscriber/remote/WorldSubscriberRemote')
+let subscriber = require('../subscriber/subscriber')
+
 //import util
 let Time = require('../util/time')
 let log = require('../util/log')
@@ -9,13 +17,31 @@ let mongodb = require('../mongodb')
 class World {
 
   constructor() {
+      this.subscribers = []
       log.insert('world','World is created!')
       this.STATE = {
         RUNNING : 'RUNNING',
         WAITING : 'WAITING'
       }
       console.log('World is created!');
-      this.startGame()
+      this.waitGame()
+      this.setTime(Time.minute(0.5))
+  }
+
+  subscribe(){
+    subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
+  }
+
+  generateSubscriber(servers,packet,remote) {
+    servers.forEach((server)=>{
+      let subscriber = dgt.client.createClient()
+      subscriber.setPacketObject(packet)
+      subscriber.setRemoteClass(remote)
+      subscriber.connect('localhost',server.port)
+    })
+  }
+  addSubscriber(subscriber){
+    this.subscribers.push(subscriber)
   }
 
   //Start Game
@@ -51,14 +77,10 @@ class World {
   }
 
   changeState(){
-    switch (this.state) {
-      case this.STATE.RUNNING:
-        this.waitGame()
-        break
-      case this.STATE.WAITING:
-        this.startGame()
-        break
-    }
+    if (this.state == this.STATE.RUNNING)
+      this.waitGame()
+    else
+      this.startGame()
   }
 
 //Update
@@ -72,7 +94,10 @@ class World {
   }
 
   updateCurrentStateDB(){
-    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state })
+    let self = this
+    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state },()=>{
+      self.notifyGameState()
+    })
   }
   //Time
   setTime(time) {
@@ -89,7 +114,23 @@ class World {
   }
 
   updateTimeDB(){
-    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.second(this.time) })
+    let self = this
+    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.toSecond(this.time) },()=>{
+      self.notifyTimeChange()
+    })
+  }
+
+  //Notify Change
+  notifyTimeChange(){
+    this.subscribers.forEach((sub)=>{
+      sub.notifyTimeChange()
+    })
+  }
+
+  notifyGameState(){
+    this.subscribers.forEach((sub)=>{
+      sub.notifyStateChange()
+    })
   }
 }
 
