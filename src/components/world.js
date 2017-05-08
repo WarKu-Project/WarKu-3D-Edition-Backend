@@ -74,18 +74,13 @@ class World {
     clearInterval(this.gameUpdate)
     log.insert('world','Finish State '+this.state)
     this.changeState()
-    this.notifyGameState()
   }
 
   changeState(){
-    switch (this.state) {
-      case this.STATE.RUNNING:
-        this.waitGame()
-        break
-      case this.STATE.WAITING:
-        this.startGame()
-        break
-    }
+    if (this.state == this.STATE.RUNNING)
+      this.waitGame()
+    else
+      this.startGame()
   }
 
 //Update
@@ -99,7 +94,10 @@ class World {
   }
 
   updateCurrentStateDB(){
-    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state })
+    let self = this
+    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state },()=>{
+      self.notifyGameState()
+    })
   }
   //Time
   setTime(time) {
@@ -116,8 +114,10 @@ class World {
   }
 
   updateTimeDB(){
-    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.toSecond(this.time) })
-    this.notifyTimeChange()
+    let self = this
+    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.toSecond(this.time) },()=>{
+      self.notifyTimeChange()
+    })
   }
 
   //Notify Change

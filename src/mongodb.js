@@ -21,7 +21,7 @@ let insert = (collection,data) => {
   })
 }
 
-let update = (collection,target,data) => {
+let update = (collection,target,data,cb) => {
   MongoClient.connect(URI,(err,db)=>{
     assert.equal(null, err)
     db.collection(collection).updateOne(target,
@@ -32,6 +32,7 @@ let update = (collection,target,data) => {
         upsert:true
       }, (err) => {
         assert.equal(err, null)
+        cb()
         db.close()
       })
   })
