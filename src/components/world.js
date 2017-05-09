@@ -5,6 +5,7 @@ let dgt = require('dgt-net')
 let packet = require('../subscriber/packet/WorldSubscriberPacket')
 let remote = require('../subscriber/remote/WorldSubscriberRemote')
 let subscriber = require('../subscriber/subscriber')
+let castle = require('../castle')
 
 //import util
 let Time = require('../util/time')
@@ -56,6 +57,7 @@ class World {
 
   //Waiting New Game
   waitGame(){
+    this.castle = new Castle()
     this.setTime(Time.minute(0.5))
     this.state = this.STATE.WAITING
     this.updateCurrentStateDB()
