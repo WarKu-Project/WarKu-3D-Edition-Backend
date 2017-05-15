@@ -27,5 +27,7 @@ process.on ('SIGINT', () => {
   })
 })
 process.on('exit',code=>{
-  process.exit(code)
+  mongodb.update('server',{ type:'world',port:process.PORT},{status:'Disconnected'},()=>{
+    process.exit(code)
+  })
 })
