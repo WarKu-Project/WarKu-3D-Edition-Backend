@@ -1,137 +1,80 @@
-//import library
-let dgt = require('dgt-net')
-
-//import subscriber component
-let packet = require('../subscriber/packet/WorldSubscriberPacket')
-let remote = require('../subscriber/remote/WorldSubscriberRemote')
-let subscriber = require('../subscriber/subscriber')
-
-//import util
+/**
+* Import Time and MongoDB
+**/
 let Time = require('../util/time')
-let log = require('../util/log')
-
-//import mongodb
-let mongodb = require('../mongodb')
-
-//define world
+let MongoDB = require('../mongodb')
+/**
+* Class World
+**/
 class World {
 
-  constructor() {
-      this.subscribers = []
-      log.insert('world','World is created!')
-      this.STATE = {
-        RUNNING : 'RUNNING',
-        WAITING : 'WAITING'
-      }
-      console.log('World is created!');
-      this.waitGame()
-      this.setTime(Time.minute(0.5))
+  constructor(){
+    this.waitGame()
   }
 
-  subscribe(){
-    subscriber.generateSubscriber(this,packet,remote,this.generateSubscriber)
+  /**
+  * Start Counting
+  **/
+  startCounting(){
+    let self = this
+    this.timer = setInterval(()=>{
+      self.count()
+    },Time.secToMs(1))
   }
-
-  generateSubscriber(servers,packet,remote) {
-    servers.forEach((server)=>{
-      let subscriber = dgt.client.createClient()
-      subscriber.setPacketObject(packet)
-      subscriber.setRemoteClass(remote)
-      subscriber.connect('localhost',server.port)
+  /**
+  * Count time
+  **/
+  count(){
+    this.time -= 1
+    console.log(this.time)
+    let self = this
+    MongoDB.update('world',{attr:'time'},{value:this.time},()=>{
+      self.checkEndState()
     })
   }
-  addSubscriber(subscriber){
-    this.subscribers.push(subscriber)
-  }
-
-  //Start Game
+  /**
+  * Start Game
+  **/
   startGame(){
-    this.setTime(Time.minute(5))
-    this.state = this.STATE.RUNNING
-    this.updateCurrentStateDB()
-    this.startUpdate()
-    log.insert('world','Game is Start')
-    console.log('Game is Start');
+    this.time = Time.minToSec(1)
+    this.startCounting()
   }
-
-  //Waiting New Game
+  /**
+  * Wait State
+  **/
   waitGame(){
-    this.setTime(Time.minute(0.5))
-    this.state = this.STATE.WAITING
-    this.updateCurrentStateDB()
-    this.startUpdate()
-    log.insert('world','Waiting for new Game')
-    console.log('Wait for new game');
+    this.time = Time.minToSec(1)
+    this.startCounting()
   }
-
-
-//Check State
-  finishStateOrContinue(){
-    if (this.isFinishState()) this.finishState()
-  }
-
-  finishState(){
-    clearInterval(this.gameUpdate)
-    log.insert('world','Finish State '+this.state)
-    this.changeState()
-  }
-
-  changeState(){
-    if (this.state == this.STATE.RUNNING)
+  /**
+  * Set State
+  **/
+  setState(){
+    if (this.state == "Running"){
+      this.state = "Waiting"
       this.waitGame()
-    else
+    }else {
+      this.state = "Running"
       this.startGame()
+    }
+    console.log(this.state)
+    MongoDB.update('world',{attr:'state'},{value:this.state})
   }
-
-//Update
-  update(){
-    this.countdown()
-    this.finishStateOrContinue()
+  /**
+  * Check End State
+  **/
+  checkEndState(){
+    if (this.isEnd()){
+      this.setState()
+      clearInterval(this.timer)
+    }
   }
-
-  startUpdate(){
-    this.gameUpdate = setInterval((world)=>{world.update()},Time.second(1),this)
-  }
-
-  updateCurrentStateDB(){
-    let self = this
-    mongodb.update('world',{'attr' : 'state'},{ 'value' : this.state },()=>{
-      self.notifyGameState()
-    })
-  }
-  //Time
-  setTime(time) {
-    this.time = time
-  }
-
-  countdown() {
-    this.time -= Time.second(1)
-    this.updateTimeDB()
-  }
-
-  isFinishState(){
-    return this.time<Time.second(0);
-  }
-
-  updateTimeDB(){
-    let self = this
-    mongodb.update('world',{'attr' : 'time'},{ 'value' : Time.toSecond(this.time) },()=>{
-      self.notifyTimeChange()
-    })
-  }
-
-  //Notify Change
-  notifyTimeChange(){
-    this.subscribers.forEach((sub)=>{
-      sub.notifyTimeChange()
-    })
-  }
-
-  notifyGameState(){
-    this.subscribers.forEach((sub)=>{
-      sub.notifyStateChange()
-    })
+  /**
+  * Is State End
+  **/
+  isEnd(){
+    return this.time<=0
   }
 }
 
-module.exports = new World()
+module.exports = new World();

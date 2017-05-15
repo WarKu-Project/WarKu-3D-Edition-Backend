@@ -1,19 +1,37 @@
-//Convert to second
-let minute = (min) => {
-  return 60000 * min
-}
-let second = (sec) => {
-  return 1000 * sec
-}
-let toSecond = (ms) => {
+/**
+* Convert Millisecond to Second
+**/
+let msToSec = (ms)=>{
   return ms/1000
 }
-let toMinute = (ms)=>{
+/**
+* Convert Millisecond to Minute
+**/
+let msToMin = (ms)=>{
   return ms/60000
 }
+/**
+* Convert Second to Millisecond
+**/
+let secToMs = (sec)=>{
+  return sec*1000
+}
+/**
+* Convert Minute to Millisecond
+**/
+let minToMs = (min)=>{
+  return min*60000
+}
+/**
+* Convert Second to Minute
+**/
+let minToSec = (min)=>{
+  return min*60
+}
 module.exports = {
-  minute : minute,
-  second : second,
-  toSecond : toSecond,
-  toMinute : toMinute
+    msToSec : msToSec,
+    msToMin : msToMin,
+    secToMs : secToMs,
+    minToMs : minToMs,
+    minToSec : minToSec
 }
