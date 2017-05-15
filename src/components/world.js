@@ -8,10 +8,36 @@ let MongoDB = require('../mongodb')
 **/
 class World {
 
-  constructor(){
+  /**
+  * Init world
+  **/
+  initWorld(){
+    this.children = []
+    this.state = 'Waiting'
+    MongoDB.update('world',{attr:'state'},{value:this.state})
     this.waitGame()
+    this.startCounting()
   }
-
+  /**
+  * Add Child Server to World
+  * @param child is world child server
+  **/
+  addChildServer(child){
+    this.children.push(child)
+  }
+  /**
+  * Remove Child Server from world
+  * @param child is world child server
+  **/
+  removeChildServer(child){
+    this.children.splice(items.indexOf(child), 1)
+  }
+  /**
+  * Notify Game state is changed
+  **/
+  notifyStateChangedToChildren(){
+    this.children.forEach((child)=>child.notifyStateChanged())
+  }
   /**
   * Start Counting
   **/
@@ -26,7 +52,6 @@ class World {
   **/
   count(){
     this.time -= 1
-    console.log(this.time)
     let self = this
     MongoDB.update('world',{attr:'time'},{value:this.time},()=>{
       self.checkEndState()
@@ -37,14 +62,12 @@ class World {
   **/
   startGame(){
     this.time = Time.minToSec(1)
-    this.startCounting()
   }
   /**
   * Wait State
   **/
   waitGame(){
     this.time = Time.minToSec(1)
-    this.startCounting()
   }
   /**
   * Set State
@@ -57,17 +80,16 @@ class World {
       this.state = "Running"
       this.startGame()
     }
-    console.log(this.state)
-    MongoDB.update('world',{attr:'state'},{value:this.state})
+    MongoDB.update('world',{attr:'state'},{value:this.state},()=>{
+      this.notifyStateChanged()
+    })
   }
   /**
   * Check End State
   **/
   checkEndState(){
-    if (this.isEnd()){
+    if (this.isEnd())
       this.setState()
-      clearInterval(this.timer)
-    }
   }
   /**
   * Is State End
