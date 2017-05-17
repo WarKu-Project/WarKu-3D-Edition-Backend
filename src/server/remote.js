@@ -3,6 +3,10 @@
 **/
 let RemoteProxy = require('dgt-net').server.RemoteProxy
 /**
+* Import MongoDB
+**/
+let mongodb = require('../mongodb')
+/**
 * Import World
 **/
 let World = require('../components/world')
@@ -34,6 +38,7 @@ class WorldChildServer extends RemoteProxy {
   **/
   notifyStateChanged(){
     this.send(packet.notifyStateChanged())
+    mongodb.update('server',{type:'world',port:process.PORT},{response:++process.response})
   }
 }
 

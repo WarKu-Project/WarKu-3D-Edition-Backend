@@ -30,7 +30,7 @@ class World {
   * @param child is world child server
   **/
   removeChildServer(child){
-    this.children.splice(items.indexOf(child), 1)
+    this.children.splice(this.children.indexOf(child), 1)
   }
   /**
   * Notify Game state is changed
@@ -80,8 +80,9 @@ class World {
       this.state = "Running"
       this.startGame()
     }
+    let self = this
     MongoDB.update('world',{attr:'state'},{value:this.state},()=>{
-      this.notifyStateChanged()
+      self.notifyStateChangedToChildren()
     })
   }
   /**

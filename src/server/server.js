@@ -24,8 +24,9 @@ server.init = ()=>{
 **/
 server.startProcessCounting = ()=>{
   let time = 0
+  process.response = 0
   setInterval(()=>{
-    mongodb.update('server',{type:'world',port:process.PORT},{time:++time,response:0})
+    mongodb.update('server',{type:'world',port:process.PORT},{time:++time,response:process.response})
   },1000)
 }
 module.exports = server

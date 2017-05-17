@@ -16,11 +16,11 @@ let mongodb = require('./mongodb')
 /**
 * Terminate Condition
 **/
-process.on ('uncaughtException', err => {
+/**process.on ('uncaughtException', err => {
   mongodb.update('server',{ type:'world',port:process.PORT},{status:'Disconnected'},()=>{
     process.exit(1)
   })
-})
+})**/
 process.on ('SIGINT', () => {
   mongodb.update('server',{ type:'world',port:process.PORT},{status:'Disconnected'},()=>{
     process.exit(0)
